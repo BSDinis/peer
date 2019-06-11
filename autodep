@@ -1,0 +1,4 @@
+network_wrappers.o: network_wrappers.c network_wrappers.h
+macros.o: macros.c macros.h
+ssl_util.o: ssl_util.c ssl_util.h macros.h
+peer.o: peer.c peer.h macros.h ssl_util.h
