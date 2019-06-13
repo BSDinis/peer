@@ -39,7 +39,6 @@ int net_get_public_ip(struct sockaddr_in *addr)
     return -1;
   }
 
-
   return 0;
 }
 
