@@ -13,7 +13,7 @@
 
 /* -------------------------------------------------- */
 
-void net_get_public_ip(struct sockaddr_in *addr)
+int net_get_public_ip(struct sockaddr_in *addr)
 {
   struct ifaddrs * addrs;
   getifaddrs(&addrs);
@@ -36,9 +36,10 @@ void net_get_public_ip(struct sockaddr_in *addr)
 
   if (!node) {
     fprintf(stderr, "Couldn't find an IPv4 address\nAborting\n");
-    exit(EXIT_FAILURE);
+    return -1;
   }
 
+  return 0;
 }
 
 /* -------------------------------------------------- */
@@ -90,7 +91,7 @@ int  net_start_listen_socket(const char *server_addr, int *server_port, int *lis
 
 /* -------------------------------------------------- */
 
-const char * get_my_ipv4_addr()
+const char * net_get_my_ipv4_addr()
 {
   static char ip[INET_ADDRSTRLEN];
   static const char *ptr = NULL;
