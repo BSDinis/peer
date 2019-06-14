@@ -44,6 +44,7 @@ int peer_connect(peer_t * const, struct sockaddr_in *addr);
 int peer_accept(peer_t * const, int listen_socket);
 
 // bool funcs
+bool peer_created(const peer_t * const peer);
 bool peer_valid(const peer_t * const);
 bool peer_want_write(peer_t *peer);
 bool peer_want_read(peer_t *peer);
