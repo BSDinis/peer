@@ -91,7 +91,7 @@ int  net_start_listen_socket(const char *server_addr, int *server_port, int *lis
 
 /* -------------------------------------------------- */
 
-const char * net_get_my_ipv4_addr()
+const char * net_get_my_ipv4_addr(void)
 {
   static char ip[INET_ADDRSTRLEN];
   static const char *ptr = NULL;

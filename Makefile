@@ -1,8 +1,8 @@
 ## Makefile for utils lib
 
-CC := gcc
+CC := clang
 INCLUDES := -I. -I/usr/local/include
-CFLAGS := -Wall -Werror -fdiagnostics-color=always $(INCLUDES)
+CFLAGS := -Wall -Werror -pedantic -fdiagnostics-color=always $(INCLUDES)
 LDFLAGS := -L. -Wall -Werror -fdiagnostics-color=always $(INCLUDES)
 LDLIBS := -lcrypto -lssl
 
