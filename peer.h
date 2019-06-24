@@ -9,6 +9,7 @@
 #include <openssl/err.h>
 #include <openssl/ssl.h>
 #include <openssl/bio.h>
+#include <arpa/inet.h>
 
 typedef struct peer_t
 {

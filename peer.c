@@ -7,7 +7,6 @@
 #include <openssl/err.h>
 #include <openssl/pem.h>
 
-#include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 
