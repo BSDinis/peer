@@ -24,8 +24,8 @@
  *  global static decls
  * ========================= */
 
-static int peer_encrypt(peer_t *peer, const uint8_t *buf_to_encrypt, ssize_t buf_sz);
-static int peer_decrypt(peer_t *peer, uint8_t * src, ssize_t len);
+static int peer_encrypt(peer_t * const peer, const uint8_t *buf_to_encrypt, ssize_t buf_sz);
+static int peer_decrypt(peer_t * const peer, uint8_t * src, ssize_t len);
 
 static inline bool ssl_status_want_io(int status) { return status == SSL_ERROR_WANT_WRITE || status == SSL_ERROR_WANT_READ; }
 static inline bool ssl_status_ok(int status) { return status == SSL_ERROR_NONE; }
@@ -61,7 +61,7 @@ static int peer_setup(peer_t * peer)
 }
 
 
-int peer_create(peer_t *peer, SSL_CTX *ctx, bool server)
+int peer_create(peer_t * const peer, SSL_CTX *ctx, bool server)
 {
   /* missing stuff */
   memset(peer, 0, sizeof(peer_t));
@@ -72,7 +72,7 @@ int peer_create(peer_t *peer, SSL_CTX *ctx, bool server)
   return peer_setup(peer);
 }
 
-int peer_delete(peer_t * peer)
+int peer_delete(peer_t * const peer)
 {
   if (peer == NULL)
     return -1;
@@ -123,7 +123,7 @@ int peer_connect(peer_t * const peer, struct sockaddr_in *addr)
   return 0;
 }
 
-int peer_accept(peer_t * peer, int listen_socket)
+int peer_accept(peer_t * const peer, int listen_socket)
 {
   socklen_t len = sizeof(struct sockaddr);
   peer->socket = accept(listen_socket, (struct sockaddr *) &peer->address, &len);
@@ -136,7 +136,7 @@ int peer_accept(peer_t * peer, int listen_socket)
   return 0;
 }
 
-int peer_close(peer_t *peer)
+int peer_close(peer_t * const peer)
 {
   if (peer == NULL)
     return -1;
@@ -186,12 +186,12 @@ static int __queue(uint8_t ** dst_buf, ssize_t *dst_sz, ssize_t * dst_cap,
   return 0;
 }
 
-static int peer_queue_to_write(peer_t *peer, const uint8_t *buf, ssize_t len)
+static int peer_queue_to_write(peer_t * const peer, const uint8_t *buf, ssize_t len)
 {
   return __queue(&peer->write_buf, &peer->write_sz, &peer->write_cap, buf, len);
 }
 
-static int peer_queue_to_process(peer_t *peer, const uint8_t *buf, ssize_t len)
+static int peer_queue_to_process(peer_t * const peer, const uint8_t *buf, ssize_t len)
 {
   return __queue(&peer->process_buf, &peer->process_sz, &peer->process_cap, buf, len);
 }
@@ -202,10 +202,10 @@ static int peer_queue_to_process(peer_t *peer, const uint8_t *buf, ssize_t len)
  *  bool funcs
  * ========================= */
 
-bool peer_created(const peer_t * const peer) { return peer->socket != -2; }
-bool peer_valid(const peer_t * const peer) { return peer->socket > 0; }
-bool peer_want_write(peer_t *peer) { return peer->write_sz > 0; }
-bool peer_want_read(peer_t *peer) { return peer->process_sz > 0; }
+bool peer_created(peer_t const * const peer) { return peer->socket != -2; }
+bool peer_valid(peer_t const * const peer) { return peer->socket > 0; }
+bool peer_want_write(peer_t const * const peer) { return peer->write_sz > 0; }
+bool peer_want_read(peer_t const * const peer) { return peer->process_sz > 0; }
 
 /* =================================================== */
 
@@ -213,10 +213,10 @@ bool peer_want_read(peer_t *peer) { return peer->process_sz > 0; }
  *  io funcs
  * ========================= */
 
-bool peer_finished_handshake(const peer_t *peer)
+bool peer_finished_handshake(peer_t const * const peer)
 { return SSL_is_init_finished(peer->ssl); }
 
-int peer_do_handshake(peer_t *peer)
+int peer_do_handshake(peer_t * const peer)
 {
   uint8_t buf[DEFAULT_BUF_SIZE];
   int status;
@@ -239,7 +239,7 @@ int peer_do_handshake(peer_t *peer)
 }
 
 /* Read encrypted bytes from socket. */
-int peer_recv(peer_t *peer)
+int peer_recv(peer_t * const peer)
 {
   uint8_t buf[DEFAULT_BUF_SIZE];
   ssize_t nbytes = read(peer->socket, buf, DEFAULT_BUF_SIZE);
@@ -250,7 +250,7 @@ int peer_recv(peer_t *peer)
     return -1;
 }
 
-int peer_prepare_message_to_send(peer_t *peer, const uint8_t * buf, ssize_t sz)
+int peer_prepare_message_to_send(peer_t * const peer, const uint8_t * buf, ssize_t sz)
 {
   if (sz > 0) {
     return peer_encrypt(peer, buf, sz);
@@ -259,7 +259,7 @@ int peer_prepare_message_to_send(peer_t *peer, const uint8_t * buf, ssize_t sz)
     return -1;
 }
 
-int peer_send(peer_t *peer)
+int peer_send(peer_t * const peer)
 {
   ssize_t nwritten = write(peer->socket, peer->write_buf, peer->write_sz);
   if (nwritten > 0) {
@@ -280,7 +280,7 @@ int peer_send(peer_t *peer)
  * ========================= */
 
 // get a public key
-EVP_PKEY *peer_get_pubkey(const peer_t * const peer)
+EVP_PKEY * const peer_get_pubkey(peer_t const * const peer)
 {
   if (!peer_valid(peer)) return NULL;
   X509 *cert = SSL_get_peer_certificate(peer->ssl);
@@ -295,7 +295,7 @@ EVP_PKEY *peer_get_pubkey(const peer_t * const peer)
 }
 
 // show the certs
-void peer_show_certificate(FILE *stream, const peer_t * const peer)
+void peer_show_certificate(FILE *stream, peer_t const * const peer)
 {
   if (!peer_valid(peer)) {
     fputs("No connection\n", stream);
@@ -306,7 +306,7 @@ void peer_show_certificate(FILE *stream, const peer_t * const peer)
 
 
 // get id
-uint64_t peer_get_id(const peer_t * const peer)
+uint64_t peer_get_id(peer_t const * const peer)
 {
   if (!peer) return 0;
   EVP_PKEY * key = peer_get_pubkey(peer);
@@ -338,7 +338,7 @@ uint64_t peer_get_id(const peer_t * const peer)
  *  getter
  * ========================= */
 
-const char * peer_get_addr(const peer_t * const peer)
+const char * peer_get_addr(peer_t const * const peer)
 {
   static char __address_str[INET_ADDRSTRLEN + 16];
   char        __str_peer_ipv4[INET_ADDRSTRLEN];
@@ -356,7 +356,7 @@ const char * peer_get_addr(const peer_t * const peer)
  *  static implementation
  * ========================= */
 
-static int peer_encrypt(peer_t *peer, const uint8_t *buf_to_encrypt, ssize_t buf_sz)
+static int peer_encrypt(peer_t * const peer, const uint8_t *buf_to_encrypt, ssize_t buf_sz)
 {
   uint8_t buf[DEFAULT_BUF_SIZE];
   int status;
@@ -392,7 +392,7 @@ static int peer_encrypt(peer_t *peer, const uint8_t *buf_to_encrypt, ssize_t buf
   return 0;
 }
 
-static int peer_decrypt(peer_t *peer, uint8_t * src, ssize_t len)
+static int peer_decrypt(peer_t * const peer, uint8_t * src, ssize_t len)
 {
   uint8_t buf[DEFAULT_BUF_SIZE];
   int status;

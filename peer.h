@@ -45,22 +45,22 @@ int peer_connect(peer_t * const, struct sockaddr_in *addr);
 int peer_accept(peer_t * const, int listen_socket);
 
 // bool funcs
-bool peer_created(const peer_t * const peer);
-bool peer_valid(const peer_t * const);
-bool peer_want_write(peer_t *peer);
-bool peer_want_read(peer_t *peer);
+bool peer_created(peer_t const * const peer);
+bool peer_valid(peer_t const * const);
+bool peer_want_write(peer_t const * const peer);
+bool peer_want_read(peer_t const * const peer);
 
 // io funcs
-bool peer_finished_handshake(const peer_t *peer);
-int peer_do_handshake(peer_t *peer);
-int peer_recv(peer_t *peer);
-int peer_send(peer_t *peer);
-int peer_prepare_message_to_send(peer_t *peer, const uint8_t * buf, ssize_t sz);
+bool peer_finished_handshake(peer_t const * const peer);
+int peer_do_handshake(peer_t * const peer);
+int peer_recv(peer_t * const peer);
+int peer_send(peer_t * const peer);
+int peer_prepare_message_to_send(peer_t * const peer, const uint8_t * buf, ssize_t sz);
 
 // crypto funcs
-EVP_PKEY *peer_get_pubkey(const peer_t * const);
-void      peer_show_certificate(FILE *stream, const peer_t * const);
-uint64_t  peer_get_id(const peer_t * const);
+EVP_PKEY * const peer_get_pubkey(peer_t const * const);
+void      peer_show_certificate(FILE *stream, peer_t const * const);
+uint64_t  peer_get_id(peer_t const * const);
 
 // getter
-const char * peer_get_addr(const peer_t * const); // static mem
+const char * peer_get_addr(peer_t const * const); // static mem
