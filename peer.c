@@ -203,7 +203,7 @@ static int peer_queue_to_process(peer_t * const peer, const uint8_t *buf, ssize_
  * ========================= */
 
 bool peer_created(peer_t const * const peer) { return peer->socket != -2; }
-bool peer_valid(peer_t const * const peer) { return peer->socket > 0; }
+bool peer_valid(peer_t const * const peer) { return peer && peer->socket > 0; }
 bool peer_want_write(peer_t const * const peer) { return peer->write_sz > 0; }
 bool peer_want_read(peer_t const * const peer) { return peer->process_sz > 0; }
 
