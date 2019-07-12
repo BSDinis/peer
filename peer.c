@@ -167,13 +167,13 @@ static int __queue(uint8_t ** dst_buf, ssize_t *dst_sz, ssize_t * dst_cap,
 {
   if (*dst_cap == 0) {
     *dst_cap = (src_sz <= DEFAULT_BUF_SIZE)
-      ? DEFAULT_BUF_SIZE : find_next_power_of_2(src_sz);
+      ? DEFAULT_BUF_SIZE
+      : find_next_power_of_2(src_sz);
 
     *dst_buf = malloc(*dst_cap * sizeof(uint8_t));
     if (*dst_buf == NULL)
       LOG_KILL("failed on malloc");
   }
-
   else if (*dst_sz + src_sz > *dst_cap) {
     *dst_cap = find_next_power_of_2(*dst_sz + src_sz);
     *dst_buf = realloc(*dst_buf, *dst_cap);
@@ -181,7 +181,7 @@ static int __queue(uint8_t ** dst_buf, ssize_t *dst_sz, ssize_t * dst_cap,
       LOG_KILL("failed on realloc");
   }
 
-  memcpy(*dst_buf + *dst_sz, src_buf, src_sz);
+  memcpy((*dst_buf) + *dst_sz, src_buf, src_sz);
   *dst_sz += src_sz;
   return 0;
 }
@@ -394,7 +394,6 @@ static int peer_encrypt(peer_t * const peer, const uint8_t *buf_to_encrypt, ssiz
 
 static int peer_decrypt(peer_t * const peer, uint8_t * src, ssize_t len)
 {
-  uint8_t buf[DEFAULT_BUF_SIZE];
   int status;
   int ret;
 
@@ -416,6 +415,8 @@ static int peer_decrypt(peer_t * const peer, uint8_t * src, ssize_t len)
 
     // read cleartext
     do {
+      uint8_t buf[DEFAULT_BUF_SIZE];
+      memset(buf, 0, sizeof(buf));
       ret = SSL_read(peer->ssl, buf, sizeof(buf));
       if (ret > 0)
         peer_queue_to_process(peer, buf, ret);
@@ -426,6 +427,8 @@ static int peer_decrypt(peer_t * const peer, uint8_t * src, ssize_t len)
     // may have renegotiation
     if (ssl_status_want_io(status))
       do {
+        uint8_t buf[DEFAULT_BUF_SIZE];
+        memset(buf, 0, sizeof(buf));
         ret = BIO_read(peer->wbio, buf, sizeof(buf));
         if (ret > 0)
           peer_queue_to_write(peer, buf, ret);
