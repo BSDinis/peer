@@ -21,22 +21,15 @@ int net_get_public_ip(struct sockaddr_in *addr)
   struct ifaddrs * node = addrs;
   while (node) {
     if (node->ifa_addr
-        && node->ifa_addr->sa_family == AF_INET
-        && ((struct sockaddr_in *)node->ifa_addr)->sin_addr.s_addr != htonl(INADDR_LOOPBACK)
-        ) {
-      // chooses first one which is not loopback
+        && node->ifa_addr->sa_family == AF_INET) {
       memcpy(addr, (struct sockaddr_in *)node->ifa_addr, sizeof(struct sockaddr_in));
-      break;
+      if (((struct sockaddr_in *)node->ifa_addr)->sin_addr.s_addr != htonl(INADDR_LOOPBACK)) {
+        // chooses first one which is not loopback
+        break;
+      }
     }
 
     node = node->ifa_next;
-  }
-
-  freeifaddrs(addrs);
-
-  if (!node) {
-    fprintf(stderr, "Couldn't find an IPv4 address\nAborting\n");
-    return -1;
   }
 
   return 0;
@@ -104,11 +97,14 @@ const char * net_get_my_ipv4_addr(void)
 
   while (node) {
     if (node->ifa_addr
-        && node->ifa_addr->sa_family == AF_INET
-        && node->ifa_name[0] == 'w') { // hack!!!! FIXME
+        && node->ifa_addr->sa_family == AF_INET) {
       struct sockaddr_in *this_address =  (struct sockaddr_in *) node->ifa_addr;
       inet_ntop(node->ifa_addr->sa_family, &(this_address->sin_addr), ip, INET_ADDRSTRLEN);
       ptr = ip;
+
+      if (node->ifa_name[0] == 'w') { // hack!!!! FIXME
+        break;
+      }
     }
 
     node = node->ifa_next;
