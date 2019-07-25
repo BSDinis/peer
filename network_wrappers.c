@@ -4,6 +4,8 @@
 
 #include "network_wrappers.h"
 
+#include "macros.h"
+
 #include <errno.h>
 #include <ifaddrs.h>
 #include <stdio.h>
@@ -37,7 +39,7 @@ int net_get_public_ip(struct sockaddr_in *addr)
 
 /* -------------------------------------------------- */
 
-int  net_start_listen_socket(const char *server_addr, int *server_port, int *listen_socket)
+int  net_start_listen_socket(const char *server_addr, int server_port, int *listen_socket)
 {
   *listen_socket = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
   if (*listen_socket < 0) {
@@ -55,29 +57,23 @@ int  net_start_listen_socket(const char *server_addr, int *server_port, int *lis
   memset(&my_addr, 0, sizeof(my_addr));
   my_addr.sin_family = AF_INET;
   my_addr.sin_addr.s_addr = inet_addr(server_addr);
-  my_addr.sin_port = htons(*server_port);
+  my_addr.sin_port = htons(server_port);
 
-  bool successful_bind = false;
-  do {
-    if (bind(*listen_socket, (struct sockaddr*)&my_addr, sizeof(struct sockaddr)) != 0) {
-      if (errno == EADDRINUSE) {
-        (*server_port)++;
-        my_addr.sin_port = htons(*server_port);
-      }
-      else {
-        perror("bind");
-        return -1;
-      }
-    }
-    else { successful_bind = true; }
-  } while (!successful_bind);
+  if (bind(*listen_socket, (struct sockaddr*)&my_addr, sizeof(struct sockaddr)) != 0) {
+    if (errno == EADDRINUSE)
+      fprintf(stderr, "net_start_listen_socket: port %d already in use\n", server_port);
+    else
+      perror("bind");
+
+    return -1;
+  }
 
   // start accept client connections
   if (listen(*listen_socket, 40) != 0) {
     perror("listen");
     return -1;
   }
-  printf("Accepting connections on port %d.\n", *server_port);
+  printf("Accepting connections on port %d.\n", server_port);
 
   return 0;
 }
