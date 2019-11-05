@@ -5,21 +5,15 @@
 #include <stdlib.h>
 #include <openssl/err.h>
 
-void error_kill(const char *file, int lineno, const char *msg)
+void error_log(const char *file, int lineno, const char *fmt, ...)
 {
-  error_log(file, lineno, msg);
-  exit(EXIT_FAILURE);
-}
+  fprintf(stderr, "%s:%d: ", file, lineno);
+  va_list ap;
+  va_start(ap, fmt);
+  fprintf(stderr, fmt, ap);
+  va_end(ap);
+  fputc('\n', stderr);
 
-void error_log(const char *file, int lineno, const char *msg)
-{
-  fprintf(stderr, "%s:%d %s\n", file, lineno, msg);
   ERR_print_errors_fp(stderr);
 }
 
-void die(const char *msg)
-{
-  // FIXME
-  perror(msg);
-  exit(1);
-}
