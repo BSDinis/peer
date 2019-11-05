@@ -4,16 +4,24 @@
 #pragma once
 
 
-#include <stdarg.h>
 #include <stdlib.h>
 
-void error_log(const char *file, int lineno, const char *fmt, ...);
+void error_log(const char *file, int lineno);
 
-#define LOG(...) error_log(__FILE__, __LINE__, __VA_ARGS__)
+#define LOG(...) \
+  {\
+    fprintf(stderr, "%s:%d: ", __FILE__, __LINE__); \
+    fprintf(stderr, __VA_ARGS__);\
+    fprintf(stderr, "\n"); \
+    error_log(__FILE__, __LINE__);\
+  }
 
 #define LOG_KILL(...) \
   {\
-    error_log(__FILE__, __LINE__, __VA_ARGS__);\
+    fprintf(stderr, "%s:%d: ", __FILE__, __LINE__); \
+    fprintf(stderr, __VA_ARGS__);\
+    fprintf(stderr, "\n"); \
+    error_log(__FILE__, __LINE__);\
     exit(EXIT_FAILURE);\
   }
 
