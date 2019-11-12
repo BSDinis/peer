@@ -418,8 +418,9 @@ static int peer_decrypt(peer_t * const peer, uint8_t * src, ssize_t len)
       uint8_t buf[DEFAULT_BUF_SIZE];
       memset(buf, 0, sizeof(buf));
       ret = SSL_read(peer->ssl, buf, sizeof(buf));
-      if (ret > 0)
+      if (ret > 0) {
         peer_queue_to_process(peer, buf, ret);
+      }
     } while (ret > 0);
 
     status = SSL_get_error(peer->ssl, ret);
