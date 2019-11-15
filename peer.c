@@ -100,7 +100,7 @@ int peer_delete(peer_t * const peer)
 
 int peer_connect(peer_t * const peer, struct sockaddr_in *addr)
 {
-  LOG("connecting");
+  //LOG("connecting");
   peer->socket = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
   if (peer->socket < 0) {
     perror("socket");
@@ -126,7 +126,7 @@ int peer_connect(peer_t * const peer, struct sockaddr_in *addr)
 
 int peer_accept(peer_t * const peer, int listen_socket)
 {
-  LOG("accepting a peer");
+  //LOG("accepting a peer");
   socklen_t len = sizeof(struct sockaddr);
   peer->socket = accept(listen_socket, (struct sockaddr *) &peer->address, &len);
   if (peer->socket == -1) {
