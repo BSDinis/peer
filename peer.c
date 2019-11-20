@@ -249,7 +249,7 @@ int peer_recv(peer_t * const peer)
   if (nbytes > 0)
     return peer_decrypt(peer, buf, nbytes);
   else
-    return -1;
+    return (errno == EWOULDBLOCK || errno == EAGAIN) ? 0 : -1;
 }
 
 int peer_prepare_message_to_send(peer_t * const peer, const uint8_t * buf, ssize_t sz)
@@ -272,7 +272,7 @@ int peer_send(peer_t * const peer)
     return 0;
   }
   else
-    return -1;
+    return (errno == EWOULDBLOCK || errno == EAGAIN) ? 0 : -1;
 }
 
 /* =================================================== */
@@ -287,7 +287,7 @@ EVP_PKEY * const peer_get_pubkey(peer_t const * const peer)
   if (!peer_valid(peer)) return NULL;
   X509 *cert = SSL_get_peer_certificate(peer->ssl);
   if (cert == NULL) {
-    fprintf(stderr, "Failed to get the certificate\n");
+    LOG("Failed to get the certificate");
     return NULL;
   }
 
