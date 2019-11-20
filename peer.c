@@ -248,8 +248,11 @@ int peer_recv(peer_t * const peer)
 
   if (nbytes > 0)
     return peer_decrypt(peer, buf, nbytes);
-  else
-    return (errno == EWOULDBLOCK || errno == EAGAIN) ? 0 : -1;
+  else if (errno != EWOULDBLOCK && errno != EAGAIN)
+    return -1;
+
+  errno = 0;
+  return 0;
 }
 
 int peer_prepare_message_to_send(peer_t * const peer, const uint8_t * buf, ssize_t sz)
@@ -271,8 +274,11 @@ int peer_send(peer_t * const peer)
     peer->write_sz -= nwritten;
     return 0;
   }
-  else
-    return (errno == EWOULDBLOCK || errno == EAGAIN) ? 0 : -1;
+  else if (errno != EWOULDBLOCK && errno != EAGAIN)
+    return -1;
+
+  errno = 0;
+  return 0;
 }
 
 /* =================================================== */
