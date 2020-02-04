@@ -11,7 +11,9 @@ ifneq ($(strip $(DEBUG)), no)
 endif
 
 ifneq ($(strip $(OPTIM)), no)
-  CFLAGS += -O2
+  CFLAGS += -O0
+else
+  CFLAGS += -O3
 endif
 
 SOURCES=$(wildcard *.c)
